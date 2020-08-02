@@ -7,7 +7,7 @@ services:
       context: ./mariadb
       dockerfile: Dockerfile
     volumes:
-      - ./mariadb_data:/var/lib/mysql
+      - ./volumes/mariadb_data:/var/lib/mysql
     #restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -22,30 +22,26 @@ services:
       context: ./php
       dockerfile: Dockerfile
     volumes:
-      - ./log/:/var/log/
+      - ./volumes/log/:/var/log/
       - ./aegea:/var/www/blog
     #restart: unless-stopped
     depends_on:
       - mariadb
 
-  caddy:
-    container_name: blog_caddy
+  nginx:
+    container_name: blog_nginx
     #restart: unless-stopped
     build:
-      context: ./caddy
+      context: ./nginx
       dockerfile: Dockerfile
-      args:
-        EMAIL: ${EMAIL}
-        CADDY_PLUGINS: ${CADDY_PLUGINS}
-    image: abiosoft/caddy
     depends_on:
       - mariadb
       - php
     volumes:
-      - ./log/:/var/log/
-      - ./caddy/.caddy:/root/.caddy/
+      - ./volumes/log/nginx:/var/log/nginx
       - ./aegea:/var/www/blog
     ports:
-      - 80:80
-      - 443:443
-      - 2015:2015
+      - 80:${NGINX_PORT}
+    environment:
+      NGINX_HOST: ${NGINX_HOST}
+      NGINX_PORT: ${NGINX_PORT}

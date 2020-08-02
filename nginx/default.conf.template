@@ -1,0 +1,21 @@
+server {
+    server_name ${NGINX_HOST};
+    listen ${NGINX_PORT};
+
+    location / {
+        root /var/www/blog;
+        index  index.php index.html index.htm;
+        try_files $uri $uri/ @seo;
+    }
+
+    location @seo {
+        rewrite ^/(.*)$ /?go=$1&$args;
+    }
+
+    location ~ \.php$ {
+        root /var/www/blog;
+        fastcgi_pass php:9000;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+}

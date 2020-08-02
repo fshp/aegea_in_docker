@@ -1,5 +1,3 @@
-.DS_Store
-aegea/
-.env
-mariadb_data/
-log/
+/.DS_Store
+/.env
+/volumes/
